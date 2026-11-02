@@ -37,6 +37,7 @@ export const Assignment = {
       }
       description
       dueAt
+      estimatedDuration
       expectsSubmission
       gradingType
       gradeGroupStudentsIndividually
@@ -72,6 +73,7 @@ export const Assignment = {
     assignmentGroup: AssignmentGroup.shape,
     description: string,
     dueAt: string,
+    estimatedDuration: string,
     expectsSubmission: bool.isRequired,
     gradingType: string,
     gradeGroupStudentsIndividually: bool,

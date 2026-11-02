@@ -648,6 +648,13 @@ module Types
       end
     end
 
+    field :estimated_duration, GraphQL::Types::ISO8601Duration, null: true
+    def estimated_duration
+      Loaders::AssociationLoader.for(AbstractAssignment, :estimated_duration).load(assignment).then do |estimated_duration|
+        estimated_duration&.duration&.iso8601
+      end
+    end
+
     field :needs_grading_count, Int, null: true
     def needs_grading_count
       return unless assignment.context.grants_right?(current_user, :manage_grades)

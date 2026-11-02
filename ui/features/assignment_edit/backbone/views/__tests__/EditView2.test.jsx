@@ -458,6 +458,30 @@ describe('EditView', () => {
     expect(data.points_possible).toBe(1.23)
   })
 
+  it('normalizes an estimated duration in hours to nested minutes', () => {
+    const view = editView()
+    view.$el.find('#assignment_estimated_duration_value').val('1.5')
+    view.$el.find('#assignment_estimated_duration_unit').val('hours')
+
+    expect(view.getFormData().estimated_duration_attributes).toEqual({minutes: 90})
+  })
+
+  it('marks an existing estimated duration for destruction when cleared', () => {
+    const view = editView({estimated_duration: {id: 12, duration: 'PT30M'}})
+    view.$el.find('#assignment_estimated_duration_value').val('')
+
+    expect(view.getFormData().estimated_duration_attributes).toEqual({id: 12, _destroy: true})
+  })
+
+  it('rejects a non-positive estimated duration', () => {
+    const view = editView()
+    view.$el.find('#assignment_estimated_duration_value').val('0')
+
+    expect(view.validateBeforeSave(view.getFormData(), {})).toMatchObject({
+      estimated_duration_value: [{message: 'Enter a positive number for estimated time'}],
+    })
+  })
+
   it('sets seconds of due_at to 59 if the new minute value is 59', () => {
     const view = editView({
       due_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),

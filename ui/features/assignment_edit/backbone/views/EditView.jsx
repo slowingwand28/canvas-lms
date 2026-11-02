@@ -166,6 +166,7 @@ function EditView() {
     this.handleGraderCommentsVisibleToGradersChanged.bind(this)
   this.handleModeratedGradingChanged = this.handleModeratedGradingChanged.bind(this)
   this._validateAllowedAttempts = this._validateAllowedAttempts.bind(this)
+  this._validateEstimatedDuration = this._validateEstimatedDuration.bind(this)
   this._validateExternalTool = this._validateExternalTool.bind(this)
   this._validatePointsPossible = this._validatePointsPossible.bind(this)
   this._validateAllowedExtensions = this._validateAllowedExtensions.bind(this)
@@ -1503,8 +1504,15 @@ EditView.prototype.afterRender = function () {
 
 EditView.prototype.toJSON = function () {
   const data = this.assignment.toView()
+  const duration = this.assignment.get('estimated_duration')?.duration
+  const durationMatch = duration?.match(/^PT(?:(\d+)H)?(?:(\d+)M)?$/)
+  const durationMinutes = durationMatch
+    ? Number(durationMatch[1] || 0) * 60 + Number(durationMatch[2] || 0)
+    : null
 
   return Object.assign(data, {
+    estimatedDurationValue: durationMinutes || '',
+    estimatedDurationUnit: 'minutes',
     assignment_attempts:
       typeof ENV !== 'undefined' && ENV !== null ? ENV.assignment_attempts_enabled : void 0,
     kalturaEnabled:
@@ -1636,6 +1644,22 @@ EditView.prototype.getFormData = function () {
   }
   if (data.peer_review_count) {
     data.peer_review_count = numberHelper.parse(data.peer_review_count)
+  }
+  const estimateValue = data.estimated_duration_value
+  const estimateUnit = data.estimated_duration_unit
+  const existingEstimate = this.assignment.get('estimated_duration')
+  delete data.estimated_duration_value
+  delete data.estimated_duration_unit
+  if (estimateValue === '' || estimateValue == null) {
+    if (existingEstimate?.id) {
+      data.estimated_duration_attributes = {id: existingEstimate.id, _destroy: true}
+    }
+  } else {
+    const minutes = Number(estimateValue) * (estimateUnit === 'hours' ? 60 : 1)
+    data.estimated_duration_attributes = {
+      ...(existingEstimate?.id ? {id: existingEstimate.id} : {}),
+      minutes,
+    }
   }
   const $grader_count = $('#grader_count')
   // The custom_params are stored as a JSONified string in a hidden input, but the API uses an
@@ -2068,6 +2092,7 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
   errors = this._validatePointsPossible(data, errors)
   errors = this._validateExternalTool(data, errors)
   errors = this._validateAllowedAttempts(data, errors)
+  errors = this._validateEstimatedDuration(data, errors)
   const data2 = {
     assignment_overrides: this.dueDateOverrideView.getAllDates(),
     postToSIS: data.post_to_sis === '1',
@@ -2365,6 +2390,19 @@ EditView.prototype._validateExternalTool = function (data, errors) {
     errors[SUBMISSION_TYPE_SELECTION_LAUNCH_BUTTON] = [{message, longMessage: true}]
   }
 
+  return errors
+}
+
+EditView.prototype._validateEstimatedDuration = function (data, errors) {
+  const input = document.getElementById('assignment_estimated_duration_value')
+  if (!input || input.value === '') return errors
+
+  const value = Number(input.value)
+  if (!Number.isFinite(value) || value <= 0) {
+    errors.estimated_duration_value = [
+      {message: I18n.t('Enter a positive number for estimated time')},
+    ]
+  }
   return errors
 }
 

@@ -60,6 +60,22 @@ it('does not render a due date if there is no dueAt set', async () => {
   expect(queryAllByText('Available Jul 11, 2016 7:00pm')).toHaveLength(0)
 })
 
+it('renders a positive estimated duration', async () => {
+  const assignment = await mockAssignment({
+    Assignment: {estimatedDuration: 'PT1H30M'},
+  })
+
+  const {getByTestId} = render(<AssignmentDetails assignment={assignment} />)
+  expect(getByTestId('estimated-duration')).toHaveTextContent('Estimated time: 90 minutes')
+})
+
+it('omits a missing estimated duration', async () => {
+  const assignment = await mockAssignment()
+
+  const {queryByTestId} = render(<AssignmentDetails assignment={assignment} />)
+  expect(queryByTestId('estimated-duration')).not.toBeInTheDocument()
+})
+
 it('renders the peer name when peer review mode is ON', async () => {
   const assignment = await mockAssignment()
 

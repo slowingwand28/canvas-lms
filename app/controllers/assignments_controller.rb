@@ -1028,6 +1028,9 @@ class AssignmentsController < ApplicationController
 
       hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @assignment.new_record?
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false, include_peer_review: true)
+      if @assignment.estimated_duration&.marked_for_destruction? == false
+        hash[:ASSIGNMENT][:estimated_duration] = estimated_duration_json(@assignment.estimated_duration, @current_user, session)
+      end
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = set_cancel_to_url
@@ -1272,6 +1275,7 @@ class AssignmentsController < ApplicationController
                   :hide_in_gradebook,
                   :intra_group_peer_reviews,
                   :important_dates,
+                  estimated_duration_attributes: %i[id minutes _destroy],
                   allowed_extensions: strong_anything,
                   turnitin_settings: strong_anything,
                   integration_data: strong_anything)

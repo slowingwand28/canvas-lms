@@ -74,6 +74,18 @@ function renderAttempts(assignment) {
   )
 }
 
+function estimatedDurationLabel(duration) {
+  const match = duration?.match(/^PT(?:(\d+)H)?(?:(\d+)M)?$/)
+  if (!match) return null
+
+  const minutes = Number(match[1] || 0) * 60 + Number(match[2] || 0)
+  if (minutes <= 0) return null
+  return I18n.t(
+    {one: 'Estimated time: 1 minute', other: 'Estimated time: %{count} minutes'},
+    {count: minutes},
+  )
+}
+
 export default function AssignmentDetails({assignment, submission}) {
   return (
     <>
@@ -138,6 +150,13 @@ export default function AssignmentDetails({assignment, submission}) {
               {renderAttempts(assignment)}
             </Flex.Item>
           </Flex>
+        )}
+        {estimatedDurationLabel(assignment.estimatedDuration) && (
+          <Flex.Item margin="small 0 0 0">
+            <Text size="small" color="secondary" data-testid="estimated-duration">
+              {estimatedDurationLabel(assignment.estimatedDuration)}
+            </Text>
+          </Flex.Item>
         )}
       </Flex>
     </>

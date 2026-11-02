@@ -37,6 +37,21 @@
     {{/if}}
   </div>
 
+  <div class="control-group">
+    <div class="form-column-left no-group">
+      <label for="assignment_estimated_duration_value">{{#t}}Estimated time{{/t}}</label>
+    </div>
+    <div class="form-column-right">
+      <input id="assignment_estimated_duration_value" name="estimated_duration_value" type="number" min="1" step="any" value="{{estimatedDurationValue}}" aria-describedby="assignment_estimated_duration_help"></input>
+      <select id="assignment_estimated_duration_unit" name="estimated_duration_unit" aria-label="{{#t}}Estimated time unit{{/t}}">
+        <option value="minutes" {{selectedIf estimatedDurationUnit "minutes"}}>{{#t}}Minutes{{/t}}</option>
+        <option value="hours" {{selectedIf estimatedDurationUnit "hours"}}>{{#t}}Hours{{/t}}</option>
+      </select>
+      <div id="assignment_estimated_duration_help">{{#t}}Optional. Enter a positive number.{{/t}}</div>
+      <div id="estimated_duration_value_errors"></div>
+    </div>
+  </div>
+
   {{#unless isQuizLTIAssignment}}
     <div class="control-group">
       {{#ifIncludes frozenAttributes "description"}}
