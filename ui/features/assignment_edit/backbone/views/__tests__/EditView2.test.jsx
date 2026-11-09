@@ -477,9 +477,10 @@ describe('EditView', () => {
     const view = editView()
     view.$el.find('#assignment_estimated_duration_value').val('0')
 
-    expect(view.validateBeforeSave(view.getFormData(), {})).toMatchObject({
-      estimated_duration_value: [{message: 'Enter a positive number for estimated time'}],
-    })
+    const errors = view.validateBeforeSave(view.getFormData(), {})
+    expect(errors.estimated_duration_value).toEqual([
+      {message: 'Enter a positive number for estimated time'},
+    ])
   })
 
   it('sets seconds of due_at to 59 if the new minute value is 59', () => {

@@ -821,6 +821,7 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
     applyOverrides: Boolean = true
   ): DateTime
   dueDateRequired: Boolean
+  estimatedDuration: ISO8601Duration
   expectsExternalSubmission: Boolean
   expectsSubmission: Boolean
 
