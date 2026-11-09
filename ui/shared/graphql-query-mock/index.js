@@ -28,7 +28,7 @@ import {print} from 'graphql/language/printer'
 import schemaString from '../../../schema.graphql'
 
 // Mock our custom scalar values in the canvas graphql schema
-const DEFAULT_MOCKS = [{URL: 'http://graphql-mocked-url.com'}, {DateTime: null}]
+const DEFAULT_MOCKS = [{URL: 'http://graphql-mocked-url.com'}, {DateTime: null}, {ISO8601Duration: null}]
 
 // Allow you to merge and replace an existing array with an empty array.
 // https://github.com/lodash/lodash/issues/1313
