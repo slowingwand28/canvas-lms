@@ -2394,7 +2394,7 @@ EditView.prototype._validateExternalTool = function (data, errors) {
 }
 
 EditView.prototype._validateEstimatedDuration = function (data, errors) {
-  const input = document.getElementById('assignment_estimated_duration_value')
+  const input = this.$el.find('#assignment_estimated_duration_value')[0]
   if (!input || input.value === '') return errors
 
   const value = Number(input.value)
