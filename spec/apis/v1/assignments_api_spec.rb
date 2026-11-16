@@ -2609,6 +2609,24 @@ describe AssignmentsApiController, type: :request do
   end
 
   describe "POST /courses/:course_id/assignments (#create)" do
+    it "persists, updates, and clears estimated duration in a standard course" do
+      json = api_create_assignment_in_course(@course, { name: "Timed assignment", estimated_duration_attributes: { minutes: 5 } })
+      assignment = Assignment.find(json["id"])
+      duration = assignment.estimated_duration
+      expect(duration.duration).to eq 5.minutes
+      expect(json["estimated_duration"]["id"]).to eq duration.id
+
+      route = { controller: "assignments_api", action: "update", format: "json", course_id: @course.id.to_s, id: assignment.to_param }
+      url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}"
+      json = api_call(:put, url, route, { assignment: { estimated_duration_attributes: { id: duration.id, minutes: 10 } } })
+      expect(duration.reload.duration).to eq 10.minutes
+      expect(json["estimated_duration"]["id"]).to eq duration.id
+
+      json = api_call(:put, url, route, { assignment: { estimated_duration_attributes: { id: duration.id, _destroy: true } } })
+      expect(assignment.reload.estimated_duration).to be_nil
+      expect(json).not_to have_key("estimated_duration")
+    end
+
     def create_assignment_json(group, group_category)
       { "name" => "some assignment",
         "position" => "1",

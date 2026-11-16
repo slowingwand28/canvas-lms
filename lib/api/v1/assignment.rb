@@ -1626,7 +1626,7 @@ module Api::V1::Assignment
   end
 
   def estimated_duration_enabled?(assignment)
-    assignment.context.is_a?(Course) && assignment.context.horizon_course?
+    assignment.context.is_a?(Course)
   end
 
   def update_lockdown_browser?(assignment_params)

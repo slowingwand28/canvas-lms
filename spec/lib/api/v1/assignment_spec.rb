@@ -645,6 +645,14 @@ describe "Api::V1::Assignment" do
       end
     end
 
+    context "in a standard course" do
+      it "returns estimated duration" do
+        EstimatedDuration.create!(duration: 5.minutes, assignment:)
+        json = api.assignment_json(assignment, user, session, {})
+        expect(json["estimated_duration"]["duration"]).to eq 5.minutes
+      end
+    end
+
     context "in a horizon course" do
       let(:account) { Account.create!(name: "Horizon Account", horizon_account: true) }
       let(:course) { Course.create!(horizon_course: true, account:) }
@@ -1645,8 +1653,8 @@ describe "Api::V1::Assignment" do
           )
         end
 
-        it "does not update the estimated duration" do
-          expect { subject }.not_to change { assignment.estimated_duration&.duration }.from(nil)
+        it "updates the estimated duration" do
+          expect { subject }.to change { assignment.estimated_duration&.duration }.from(nil).to(5.minutes)
         end
       end
     end
